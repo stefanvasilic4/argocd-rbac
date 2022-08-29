@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: simple-app                    # name of your app ; App is logical grouping of resources (deploy,services etc)
+  namespace: openshift-gitops         # namespace where argocd instance resides , in case of community is argocd
+spec:
+  destination:
+    namespace: test                   
+    server: https://kubernetes.default.svc   # cluster resources are created in, except when argo manages external k8s
+  project: default                           # argo concept , nothing to do with ocp project
+  source: 
+    path: apps/bgd/overlays/bgd              # path to overlays
+    repoURL: https://github.com/redhat-developer-demos/openshift-gitops-examples
+    targetRevision: main                     # branch
+  syncPolicy: 
+    automated:
+      prune: true                            # what happens when resource is no longer in git ? if true is deleted
+      selfHeal: false                        # changes made to the live cluster will not trigger automated sync. 
+    syncOptions:
+    - CreateNamespace=true
